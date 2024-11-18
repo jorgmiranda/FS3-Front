@@ -31,14 +31,17 @@
                     <li>
                         <a class="nav-link navlink" routerLink="/admin/editarProducto/cuidado_capilar">Administrar - Cuidado Capilar</a>
                     </li>
+                    <li>
+                        <a class="nav-link navlink" routerLink="/admin/mantenedorUsuarios">Mantenedor Usuarios</a>
+                    </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             Usuario
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item menu-usuario" href="#">Usuario: Administrador</a></li>
+                            <li><a class="dropdown-item menu-usuario">Usuario: Administrador</a></li>
                             <li><hr class="dropdown-divider cerrarSesion-sep"></li>
-                            <li><a class="dropdown-item cerrarSesion" href="#" (click)="apagarSesionAdmin()">Cerrar Sesión</a></li>
+                            <li><a class="dropdown-item cerrarSesion" (click)="apagarSesionAdmin()">Cerrar Sesión</a></li>
                         </ul>
                     </li>
                 </ul>

@@ -8,6 +8,7 @@ import { RecuperarContrasenaComponent } from './components/recuperar-contrasena/
 import { EditarPerfilComponent } from './components/usuario/editar-perfil/editar-perfil.component';
 import { EditarProductosComponent } from './components/admin/editar-productos/editar-productos.component';
 import { InicioAdminComponent } from './components/admin/inicio-admin/inicio-admin.component';
+import { ListaUsuariosComponent } from './components/admin/lista-usuarios/lista-usuarios.component';
 
 export const routes: Routes = [
     {path: 'inicio', component: InicioComponent},
@@ -18,8 +19,10 @@ export const routes: Routes = [
     {path: 'usuario/editarDatos', component:EditarPerfilComponent},
     {path: 'admin/inicio', component:InicioAdminComponent},
     {path: 'admin/editarProducto/:seccion', component:EditarProductosComponent},
+    {path: 'admin/mantenedorUsuarios', component:ListaUsuariosComponent},
     //Pagina de inicio
-    {path: '**', redirectTo: 'inicio'}
+    {path: '**', redirectTo: 'inicio'},
+    {path: '', redirectTo: 'inicio', pathMatch: 'full'},
 ];
 
 @NgModule({

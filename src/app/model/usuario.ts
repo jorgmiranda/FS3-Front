@@ -5,6 +5,11 @@
 
 export interface Usuario {
     /**
+     * Numero identificador del usuario
+     * @example 1
+     */
+    id: number;
+    /**
      * Nombre completo del usuario
      * @example "Jorge Miranda"
      */
@@ -18,7 +23,7 @@ export interface Usuario {
      * Correo del usuario
      * @example "jorge.miranda@gmail.com"
      */
-    correo: string;
+    correoUsuario: string;
     /**
      * Dirección de despacho del usuario
      * @example "Calle 123, Ciudad, Santiago"
@@ -38,4 +43,8 @@ export interface Usuario {
      * Indicador si el usuario tiene la sesión iniciada.
     */
     sesionIniciada: boolean;
+    /**
+     * Rol de usuario logeado
+     */
+    rol: string;
 }
