@@ -73,6 +73,6 @@ export class UsuarioService {
     const usuarios: Usuario[] = JSON.parse(sessionStorage.getItem(this.storageKey) || '[]');
     const updatedUsuarios = usuarios.filter(u => u.id !== id);
     sessionStorage.setItem(this.storageKey, JSON.stringify(updatedUsuarios));
-    return of();
+    return of(void 0);
   }
 }

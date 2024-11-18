@@ -242,12 +242,16 @@ submitForm(): void {
  * @param usuario - Usuario a eliminar.
  */
 eliminar(usuario: Usuario): void {
-  this.usuarioService.eliminarUsuario(usuario.id).subscribe(() => {
-    console.log('Usuario Eliminado Exitosamente');
-    this.obtenerTodosLosUsuarios();
-    alert('Usuario Eliminado Exitosamente');
-  }, error => {
-    console.error('Ocurrió un error al eliminar un usuario:', error);
+  this.usuarioService.eliminarUsuario(usuario.id).subscribe({
+    next: () => {
+      console.log('Usuario Eliminado Exitosamente');
+      this.obtenerTodosLosUsuarios();
+      alert('Usuario Eliminado Exitosamente');
+    },
+    error: (error) => {
+      console.error('Ocurrió un error al eliminar un usuario:', error);
+      alert('Ocurrió un error al eliminar un usuario.');
+    }
   });
 }
 }
