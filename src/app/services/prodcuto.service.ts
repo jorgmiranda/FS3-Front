@@ -41,10 +41,10 @@ export class ProductoService {
    * @param producto - Objeto de producto a agregar.
    * @returns Un Observable con el producto agregado.
    */
-  agregarProducto(producto: Producto): Observable<Producto> {
-    const productos: Producto[] = JSON.parse(sessionStorage.getItem(this.storageKey) || '[]');
+  agregarProducto(producto: Producto, seccion: String): Observable<Producto> {
+    const productos: Producto[] = JSON.parse(sessionStorage.getItem(this.storageKey +"_"+seccion) || '[]');
     productos.push(producto);
-    sessionStorage.setItem(this.storageKey, JSON.stringify(productos));
+    sessionStorage.setItem(this.storageKey+"_"+seccion, JSON.stringify(productos));
     return of(producto);
   }
 
@@ -65,12 +65,12 @@ export class ProductoService {
    * @param producto - Objeto de producto con los nuevos datos.
    * @returns Un Observable con el producto actualizado.
    */
-  actualizarProducto(id: number, producto: Producto): Observable<Producto> {
-    const productos: Producto[] = JSON.parse(sessionStorage.getItem(this.storageKey) || '[]');
+  actualizarProducto(id: number, producto: Producto,  seccion: String): Observable<Producto> {
+    const productos: Producto[] = JSON.parse(sessionStorage.getItem(this.storageKey+"_"+seccion) || '[]');
     const index = productos.findIndex(p => p.id === id);
     if (index !== -1) {
       productos[index] = producto;
-      sessionStorage.setItem(this.storageKey, JSON.stringify(productos));
+      sessionStorage.setItem(this.storageKey+"_"+seccion, JSON.stringify(productos));
     }
     return of(producto);
   }
@@ -80,10 +80,10 @@ export class ProductoService {
    * @param id - ID del producto a eliminar.
    * @returns Un Observable vacío que indica la eliminación.
    */
-  eliminarProducto(id: number): Observable<void> {
-    const productos: Producto[] = JSON.parse(sessionStorage.getItem(this.storageKey) || '[]');
+  eliminarProducto(id: number, seccion: String): Observable<void> {
+    const productos: Producto[] = JSON.parse(sessionStorage.getItem(this.storageKey+"_"+seccion) || '[]');
     const productosActualizados = productos.filter(p => p.id !== id);
-    sessionStorage.setItem(this.storageKey, JSON.stringify(productosActualizados));
-    return of();
+    sessionStorage.setItem(this.storageKey+"_"+seccion, JSON.stringify(productosActualizados));
+    return of(void 0);
   }
 }

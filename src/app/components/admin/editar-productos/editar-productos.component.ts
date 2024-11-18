@@ -275,14 +275,14 @@ async onSubmit(form: FormGroup, product: Producto): Promise<void> {
     product.precio = updatedProduct.precio;
     product.descripcion = updatedProduct.descripcion;
     product.tipoProducto = updatedProduct.tipoProducto;
-
+    product.urlImg = "assets/img/placeholder.jpg";
     const file = form.get('imagen')?.value;
     // if (file instanceof File) {
     //   const url = await this.guardarImagenStorage(file);
     //   product.urlImg = url;
     // }
 
-    this.productoService.actualizarProducto(product.id, product).subscribe(() => {
+    this.productoService.actualizarProducto(product.id, product, this.seccion).subscribe(() => {
       this.inicializarProductos();
       alert('La información del producto ha sido actualizada correctamente.');
     }, error => {
@@ -301,12 +301,16 @@ async onSubmit(form: FormGroup, product: Producto): Promise<void> {
 eliminar(event: Event, producto: Producto): void {
   event.preventDefault();
 
-  this.productoService.eliminarProducto(producto.id).subscribe(() => {
-    this.inicializarProductos();
-    alert("Producto eliminado exitosamente");
-  }, error => {
-    console.error('Error al eliminar el producto:', error);
-    alert('Hubo un error al eliminar el producto.');
+  this.productoService.eliminarProducto(producto.id, this.seccion).subscribe({
+    next: () => {
+      this.inicializarProductos();
+      alert("Producto eliminado exitosamente");
+      console.log("Producto eliminado exitosamente");
+    },
+    error: (error) => {
+      console.error('Error al eliminar el producto:', error);
+      alert('Hubo un error al eliminar el producto.');
+    }
   });
 }
 
@@ -325,10 +329,10 @@ async submitForm(): Promise<void> {
         precio: this.crearProdcutoForm.get('precioProducto')?.value,
         tipoProducto: this.crearProdcutoForm.get('tipoProducto')?.value,
         descripcion: this.crearProdcutoForm.get('descripcionProducto')?.value,
-        urlImg: ""
+        urlImg: "assets/img/placeholder.jpg"
       };
 
-      this.productoService.agregarProducto(nuevoProducto).subscribe(() => {
+      this.productoService.agregarProducto(nuevoProducto, this.seccion).subscribe(() => {
         this.inicializarProductos();
         alert("Producto Creado Exitosamente");
         this.modalInstance.hide();

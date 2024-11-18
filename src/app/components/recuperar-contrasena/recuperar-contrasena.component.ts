@@ -54,7 +54,7 @@ export class RecuperarContrasenaComponent {
       let contrasenaEncontrada = '';
       if(this.listaUsuarios){
         this.listaUsuarios.forEach(function (usuario) {
-          if (usuario.correo == correo) {
+          if (usuario.correoUsuario == correo) {
             contrasenaEncontrada = usuario.contrasena;
           }
       });
