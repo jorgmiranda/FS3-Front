@@ -56,7 +56,7 @@ export class EditarPerfilComponent {
     if (this.usuariologeado) {
       this.updateForm = this.fb.group({
         nombreCompleto: [this.usuariologeado.nombreCompleto, Validators.required],
-        correoUsuario: [this.usuariologeado.correo, [Validators.required, Validators.email]],
+        correoUsuario: [this.usuariologeado.correoUsuario, [Validators.required, Validators.email]],
         fechaNacimientoUsuario: [this.usuariologeado.fechaNacimiento, [Validators.required, this.validarEdad.bind(this)]],
         contrasenaUsuario1: [this.usuariologeado.contrasena, [Validators.required, this.validarContrasenaFormato()]],
         contrasenaUsuario2: [this.usuariologeado.contrasena, Validators.required],
@@ -77,7 +77,7 @@ export class EditarPerfilComponent {
       const nombreUsuario = this.usuariologeado.nombreUsuario;
       const valoresFormulario = this.updateForm.value;
       this.usuariologeado.nombreCompleto = valoresFormulario.nombreCompleto;
-      this.usuariologeado.correo = valoresFormulario.correoUsuario;
+      this.usuariologeado.correoUsuario = valoresFormulario.correoUsuario;
       this.usuariologeado.fechaNacimiento = valoresFormulario.fechaNacimientoUsuario;
       this.usuariologeado.contrasena = valoresFormulario.contrasenaUsuario1;
       this.usuariologeado.direccionDespacho = valoresFormulario.direccionDespacho;
