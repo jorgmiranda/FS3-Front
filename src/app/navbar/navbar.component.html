@@ -55,10 +55,10 @@
                             Usuario
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item menu-usuario" href="#">{{ usuariologeado.nombreUsuario }}</a></li>
+                            <li><a class="dropdown-item menu-usuario" routerLink="/inicio">{{ usuariologeado.nombreUsuario }}</a></li>
                             <li><a class="dropdown-item editarPerfil" routerLink="/usuario/editarDatos">Editar Perfil</a></li>
                             <li><hr class="dropdown-divider cerrarSesion-sep"></li>
-                            <li><a class="dropdown-item cerrarSesion" href="#" (click)="cerrarSesion()">Cerrar Sesión</a></li>
+                            <li><a class="dropdown-item cerrarSesion"  (click)="cerrarSesion()">Cerrar Sesión</a></li>
                         </ul>
                     </li>
                 </ul>

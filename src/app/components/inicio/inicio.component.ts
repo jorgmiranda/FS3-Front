@@ -4,6 +4,8 @@ import { isPlatformBrowser } from '@angular/common';
 import { NavbarComponent } from '../../navbar/navbar.component';
 import { FooterComponent } from '../../footer/footer.component';
 import { Usuario } from '../../model/usuario';
+import { UsuarioService } from '../../services/usuario.service';
+import { HttpClientModule } from '@angular/common/http';
 
 /**
  * @description
@@ -15,9 +17,10 @@ import { Usuario } from '../../model/usuario';
 @Component({
   selector: 'app-inicio',
   standalone: true,
-  imports: [NavbarComponent, FooterComponent, CommonModule],
+  imports: [NavbarComponent, FooterComponent, CommonModule, HttpClientModule],
   templateUrl: './inicio.component.html',
-  styleUrl: './inicio.component.scss'
+  styleUrl: './inicio.component.scss',
+  providers: [UsuarioService]
 })
 export class InicioComponent implements OnInit{
 
@@ -40,22 +43,25 @@ export class InicioComponent implements OnInit{
   /**
    * @constructor
    * @param platformId - Identificado de la plataforma (Navegador o Servidor)
+   * @param usuarioService - Servicio de de Usuarios utilizado para consumir los servicios REST
    */
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) { }
+  constructor(@Inject(PLATFORM_ID) private platformId: Object, private usuarioService: UsuarioService) { }
 
   /**
    * Metodo de inicialización del componente
    * Se inicializan las lista de productos/usuarios guardados en sesión.
    * Inicializa la funcionalidad del carrito permitiendo su uso en esta pagina.
-   * Verifica si el usuario esta logeado en el sistema
+   * Inicialia la lista de Usuarios
    */
   ngOnInit(): void {
+    this.obtenerTodosLosUsuarios();
     if (isPlatformBrowser(this.platformId)) {
       this.listaProductos = JSON.parse(sessionStorage.getItem('listaProductos') || '[]');
-      this.listaUsuarios = JSON.parse(sessionStorage.getItem('usuarios') || '[]');
+      //this.listaUsuarios = JSON.parse(sessionStorage.getItem('usuarios') || '[]');
       this.funcionalidadCarrito();
-      this.verificarUsuario();
-
+      
+     
+      
     }
   }
   /**
@@ -159,6 +165,18 @@ export class InicioComponent implements OnInit{
       }
     });
   
+  }
+
+  /**
+   * Consume el servicio REST para obtener todos los usuarios del sistema
+   * Una vez inicialidad la lista se invoca el metodo verificarUsuario
+   * que se encarga de identificar el usuario logeado.
+   */
+  obtenerTodosLosUsuarios():void{
+    this.usuarioService.obtenerTodosLosUsuarios().subscribe(data => {
+      this.listaUsuarios = data;
+      this.verificarUsuario();
+    });
   }
 }
 

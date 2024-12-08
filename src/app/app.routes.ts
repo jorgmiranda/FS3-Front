@@ -21,8 +21,9 @@ export const routes: Routes = [
     {path: 'admin/editarProducto/:seccion', component:EditarProductosComponent},
     {path: 'admin/mantenedorUsuarios', component:ListaUsuariosComponent},
     //Pagina de inicio
-    {path: '**', redirectTo: 'inicio'},
     {path: '', redirectTo: 'inicio', pathMatch: 'full'},
+    {path: '**', redirectTo: 'inicio'}
+    
 ];
 
 @NgModule({

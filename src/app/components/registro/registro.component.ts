@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { NavbarComponent } from '../../navbar/navbar.component';
 import { FooterComponent } from '../../footer/footer.component';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, ValidationErrors, ValidatorFn, AbstractControl  } from '@angular/forms'; 
+import { UsuarioService } from '../../services/usuario.service';
+import { Usuario } from '../../model/usuario';
 
 /**
  * @description
@@ -15,7 +17,8 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, ValidationErro
   standalone: true,
   imports: [NavbarComponent, FooterComponent, ReactiveFormsModule, CommonModule],
   templateUrl: './registro.component.html',
-  styleUrl: './registro.component.scss'
+  styleUrl: './registro.component.scss',
+  providers: [UsuarioService]
 })
 export class RegistroComponent {
   /**
@@ -25,13 +28,14 @@ export class RegistroComponent {
   /**
    * Lista de usuarios almancenados en sesión
    */
-  listaUsuarios: any[] = JSON.parse(sessionStorage.getItem('usuarios') || '[]');
+  listaUsuarios: Usuario[] = [];
 
   /**
    * @constructor
    * @param fb - Servicio de creación de formulario de Angular
+   * @param usuarioService - Servicio de de Usuarios utilizado para consumir los servicios REST
    */
-  constructor (private fb: FormBuilder) {}
+  constructor (private usuarioService: UsuarioService, private fb: FormBuilder) {}
 
   /**
    * Metodo de inicialización del componente.
@@ -49,6 +53,17 @@ export class RegistroComponent {
     },{
       validators: this.validarContrasenasIguales
     });
+    this.obtenerTodosLosUsuarios();
+  }
+
+  /**
+   * Obtiene todos los usuarios registrados en el JSON REST
+   * Una vez obtenidos, llama al metodo verificarSessionUsuario
+   */
+  obtenerTodosLosUsuarios():void{
+    this.usuarioService.obtenerTodosLosUsuarios().subscribe(data => {
+      this.listaUsuarios = data;
+    });
   }
 
   /**
@@ -60,23 +75,26 @@ export class RegistroComponent {
       // Se Obtienen los usuarios registrados o inicia un arreglo vacio
       //this.listaUsuarios = JSON.parse(sessionStorage.getItem('usuarios') || '[]');
       //Se crea el objeto usuario con los valores del formulario
-      const nuevoUsuario = {
+      const nuevoUsuario: Usuario = {
+        id: this.listaUsuarios.length > 0 ? Math.max(...this.listaUsuarios.map((p: any) => p.id)) + 1 : 1,
         nombreCompleto: this.registrationForm.get('nombreCompleto')!.value,
         nombreUsuario: this.registrationForm.get('nombreUsuario')!.value,
-        correo: this.registrationForm.get('correoUsuario')!.value,
+        correoUsuario: this.registrationForm.get('correoUsuario')!.value,
         direccionDespacho: this.registrationForm.get('direccionDespacho')!.value,
         contrasena: this.registrationForm.get('contrasenaUsuario1')!.value,
         fechaNacimiento: this.registrationForm.get('fechaNacimientoUsuario')!.value,
-        sesionIniciada: false
+        sesionIniciada: false,
+        rol: "Usuario"
     };
 
-    //Agregar el usuario registrado al arreglo
-    this.listaUsuarios.push(nuevoUsuario);
+    //Agregar usuario
+    this.usuarioService.agregarUsuario(nuevoUsuario).subscribe(nuevo => {
+      console.log('Usuario Agregado Exitosamente', nuevo); 
+    }, error => {
+      console.error('Ocurrio un error al agregar un usuario:', error);
+    });
 
-    sessionStorage.setItem('usuarios', JSON.stringify(this.listaUsuarios));
     alert("Te has registrado con éxito.");
-
-    console.log("Resultado: "+ this.registrationForm.get('nombreCompleto')!.value);
 
     this.registrationForm.reset();
     }else{

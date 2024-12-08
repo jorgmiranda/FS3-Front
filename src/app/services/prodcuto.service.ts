@@ -1,89 +1,77 @@
+import { HttpHeaders, HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { Producto } from '../model/producto';
 
 /**
- * Servicio para gestionar operaciones CRUD de Productos desde sessionStorage.
+ * Servicio para gestionar operaciones CRUD de Productos
  */
 @Injectable({
   providedIn: 'root'
 })
 export class ProductoService {
   /**
-   * Clave para almacenar productos en sessionStorage.
+   * Opciones de cabecera HTTP para las solicitudes.
    */
-  private storageKey = 'productos';
-
-  constructor() {}
+  httpOptions = {
+    headers: new HttpHeaders({
+      "Content-Type": "application/json"
+    })
+  }
 
   /**
-   * Obtiene la lista de todos los productos desde sessionStorage.
-   * @returns Un Observable con la lista de productos.
+   * URL base del endpoint de productos.
+   */
+  private baseUrl = 'http://localhost:8081/productos';
+  // private baseUrl = 'http://52.200.236.194:8080/productos';
+
+  /**
+   * Constructor del servicio que inyecta el HttpClient.
+   * @param http HttpClient para realizar solicitudes HTTP.
+   */
+  constructor(private http: HttpClient) { }
+
+  /**
+   * Obtiene la lista de todos los usuarios.
+   * @returns Un Observable con la lista de productos
    */
   obtenerTodosLosProductos(): Observable<Producto[]> {
-    const productos = JSON.parse(sessionStorage.getItem(this.storageKey) || '[]');
-    return of(productos);
+    return this.http.get<Producto[]>(this.baseUrl);
   }
 
   /**
-   * Obtiene un producto por su ID desde sessionStorage.
-   * @param id - ID del producto a obtener.
-   * @returns Un Observable con el producto correspondiente al ID o null si no existe.
+   * Obtiene el producto por su ID
+   * @param id - ID del producto a obtener
+   * @returns - Un Observable con el usuario agregado.
    */
-  obtenerProductoPorID(id: number): Observable<Producto | null> {
-    const productos: Producto[] = JSON.parse(sessionStorage.getItem(this.storageKey) || '[]');
-    const producto = productos.find(p => p.id === id);
-    return of(producto || null);
+  obtenerProductoPorID(id: number): Observable<Producto> {
+    return this.http.get<Producto>(`${this.baseUrl}/${id}`);
+  }
+
+  agregarProducto(producto : Producto): Observable<Producto>{
+    return this.http.post<Producto>(this.baseUrl, producto, this.httpOptions);
   }
 
   /**
-   * Agrega un nuevo producto en sessionStorage.
-   * @param producto - Objeto de producto a agregar.
-   * @returns Un Observable con el producto agregado.
+   * Obtiene los productos segun su tipo
+   * @param tipo - Tipo de producto a obtener
+   * @returns - Un observable con los productos obtenidos segun su tipo
    */
-  agregarProducto(producto: Producto, seccion: String): Observable<Producto> {
-    const productos: Producto[] = JSON.parse(sessionStorage.getItem(this.storageKey +"_"+seccion) || '[]');
-    productos.push(producto);
-    sessionStorage.setItem(this.storageKey+"_"+seccion, JSON.stringify(productos));
-    return of(producto);
+  obtenerProductosPorTipo(tipo: String): Observable<Producto[]> {
+    return this.http.get<Producto[]>(`${this.baseUrl}/tipo/${tipo}`);
   }
 
   /**
-   * Obtiene productos por su tipo desde sessionStorage.
-   * @param tipo - Tipo de producto a obtener.
-   * @returns Un Observable con los productos obtenidos según su tipo.
+   * Actualiza un producto existente
+   * @param id - Id del producto a actualizar
+   * @param producto - Objeto de producto con los nuevos datos
+   * @returns - Un observable con el producto actualizado
    */
-  obtenerProductosPorTipo(tipo: string): Observable<Producto[]> {
-    const productos: Producto[] = JSON.parse(sessionStorage.getItem(this.storageKey) || '[]');
-    const productosFiltrados = productos.filter(p => p.tipoProducto === tipo);
-    return of(productosFiltrados);
+  actualizarProducto(id: number, producto: Producto): Observable<Producto> {
+    return this.http.put<Producto>(`${this.baseUrl}/${id}`, producto, this.httpOptions);
   }
 
-  /**
-   * Actualiza un producto existente en sessionStorage.
-   * @param id - ID del producto a actualizar.
-   * @param producto - Objeto de producto con los nuevos datos.
-   * @returns Un Observable con el producto actualizado.
-   */
-  actualizarProducto(id: number, producto: Producto,  seccion: String): Observable<Producto> {
-    const productos: Producto[] = JSON.parse(sessionStorage.getItem(this.storageKey+"_"+seccion) || '[]');
-    const index = productos.findIndex(p => p.id === id);
-    if (index !== -1) {
-      productos[index] = producto;
-      sessionStorage.setItem(this.storageKey+"_"+seccion, JSON.stringify(productos));
-    }
-    return of(producto);
-  }
-
-  /**
-   * Elimina un producto por su ID en sessionStorage.
-   * @param id - ID del producto a eliminar.
-   * @returns Un Observable vacío que indica la eliminación.
-   */
-  eliminarProducto(id: number, seccion: String): Observable<void> {
-    const productos: Producto[] = JSON.parse(sessionStorage.getItem(this.storageKey+"_"+seccion) || '[]');
-    const productosActualizados = productos.filter(p => p.id !== id);
-    sessionStorage.setItem(this.storageKey+"_"+seccion, JSON.stringify(productosActualizados));
-    return of(void 0);
+  eliminarProducto(id:number) : Observable<void>{
+    return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
 }

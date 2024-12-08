@@ -17,5 +17,5 @@ export class AppComponent {
   /**
    * Variable titulo
    */
-  title = 'ActividadSumativa2';
+  title = 'ActividadExamen';
 }
