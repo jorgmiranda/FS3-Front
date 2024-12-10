@@ -6,7 +6,6 @@ import { NavbaradminComponent } from '../navbaradmin/navbaradmin.component';
 import { FooterComponent } from '../../../footer/footer.component';
 import { Usuario } from '../../../model/usuario';
 import { UsuarioService } from '../../../services/usuario.service';
-
 /**
  * Se declara la variable de bootstrap para el modal
  */
@@ -54,7 +53,7 @@ export class ListaUsuariosComponent {
    * @param usuarioService - Servicio de de Usuarios utilizado para consumir los servicios REST
    * @param fb - Servicio de creación de formulario de Angular
    */
-  constructor(private usuarioService: UsuarioService, private fb: FormBuilder) { }
+  constructor(private usuarioService: UsuarioService, public fb: FormBuilder) { }
 
    /**
    * Metodo de inicialización del componente.
@@ -72,11 +71,11 @@ export class ListaUsuariosComponent {
    * Obtiene todos los usuarios registrados en el JSON REST
    * Una vez obtenidos, llama al metodo verificarSessionUsuario
    */
-obtenerTodosLosUsuarios(): void {
-  this.usuarioService.obtenerTodosLosUsuarios().subscribe(data => {
-    this.usuarios = data;
-  });
-}
+  obtenerTodosLosUsuarios():void{
+    this.usuarioService.obtenerTodosLosUsuarios().subscribe(data => {
+      this.usuarios = data;
+    });
+  }
 
   /**
    * Inicializa el formulario de creación
@@ -181,77 +180,83 @@ obtenerTodosLosUsuarios(): void {
     this.modalInstance.show();
   }
 
-/**
- * Verifica si el submit es para creación o edición.
- * En caso de crear, se envía la solicitud al servicio.
- * En caso de editar, se modifica el usuario con los parámetros entregados.
- */
-submitForm(): void {
-  if (this.mantenedorForm.valid) {
-    if (this.editingId !== null) {
-      // Lógica para actualizar la persona
-      const usuarioActualizado: Usuario = {
-        id: this.editingId!,
-        nombreCompleto: this.mantenedorForm.get('nombreCompleto')?.value,
-        nombreUsuario: this.mantenedorForm.get('nombreUsuario')?.value,
-        correoUsuario: this.mantenedorForm.get('correoUsuario')?.value,
-        fechaNacimiento: this.mantenedorForm.get('fechaNacimiento')?.value,
-        contrasena: this.mantenedorForm.get('contrasenaUsuario1')?.value,
-        direccionDespacho: this.mantenedorForm.get('direccionDespacho')?.value,
-        rol: this.mantenedorForm.get('rol')?.value,
-        sesionIniciada: false
-      };
+  /**
+   * Verifica si el submit es para creación o edición.
+   * En caso de crear, se envia la solicitud al servicio 
+   * En caso de editar, se modifica el usuario con los parametros entregados
+   */
+  submitForm(): void {
+    if (this.mantenedorForm.valid) {
+      const persona = this.mantenedorForm.value;
+      if (this.editingId !== null) {
+        // Lógica para actualizar la persona
+        const usuarioActualizado: Usuario = {
+          id: this.editingId!,
+          nombreCompleto: this.mantenedorForm.get('nombreCompleto')?.value,
+          nombreUsuario: this.mantenedorForm.get('nombreUsuario')?.value,
+          correoUsuario: this.mantenedorForm.get('correoUsuario')?.value,
+          fechaNacimiento: this.mantenedorForm.get('fechaNacimiento')?.value,
+          contrasena: this.mantenedorForm.get('contrasenaUsuario1')?.value,
+          direccionDespacho: this.mantenedorForm.get('direccionDespacho')?.value,
+          rol: this.mantenedorForm.get('rol')?.value,
+          sesionIniciada: false
+        };
+         // Actualiza la lista de usuarios
+        this.usuarios = this.usuarios.map(u => u.id === this.editingId ? usuarioActualizado : u);
+        this.usuarioService.actualizarUsuario(this.editingId, usuarioActualizado).subscribe(edit => {
+          console.log('Usuario Editado Exitosamente', edit);
+          this.obtenerTodosLosUsuarios();  
+        }, error => {
+          console.error('Ocurrio un error al editar un usuario:', error);
+        });
+      } else {
+        // Lógica para agregar nueva persona
+        const nuevoUsuario: Usuario = {
+          id: this.usuarios.length > 0 ? Math.max(...this.usuarios.map((p: any) => p.id)) + 1 : 1,
+          nombreCompleto: this.mantenedorForm.get('nombreCompleto')?.value,
+          nombreUsuario: this.mantenedorForm.get('nombreUsuario')?.value,
+          contrasena: this.mantenedorForm.get('contrasenaUsuario1')?.value,
+          correoUsuario: this.mantenedorForm.get('correoUsuario')?.value,
+          fechaNacimiento: this.mantenedorForm.get('fechaNacimiento')?.value,
+          direccionDespacho: this.mantenedorForm.get('direccionDespacho')?.value,
+          rol: this.mantenedorForm.get('rol')?.value,
+          sesionIniciada: false
+        }
+        console.log(nuevoUsuario);
+        this.usuarios.push(nuevoUsuario);
+        this.usuarioService.agregarUsuario(nuevoUsuario).subscribe(nuevo => {
+          console.log('Usuario Agregado Exitosamente', nuevo);
+          this.obtenerTodosLosUsuarios();  
+        }, error => {
+          console.error('Ocurrio un error al agregar un usuario:', error);
+        });
+      }
+      
+      this.modalInstance.hide();
+    } else {
+      console.log(this.mantenedorForm.errors);
+      alert('Favor de ingresar los campos obligatorios');
+    }
+  }
 
-      this.usuarioService.actualizarUsuario(this.editingId, usuarioActualizado).subscribe(() => {
-        console.log('Usuario Editado Exitosamente');
+  /**
+   * Eliminar el usuario de la lista
+   * @param usuario - Usuario a elminar
+   */
+  eliminar(usuario: Usuario): void {
+    const index = this.usuarios.findIndex((elemento: any) => elemento.id === usuario.id);
+    
+    if (index !== -1) {
+      this.usuarios.splice(index, 1);
+      this.usuarioService.eliminarUsuario(usuario.id).subscribe(elimnado => {
+        console.log('Usuario Eliminado Exitosamente');
         this.obtenerTodosLosUsuarios();
+        alert("Usuario Eliminado Exitosamente");  
       }, error => {
-        console.error('Ocurrió un error al editar un usuario:', error);
+        console.error('Ocurrio un error al eliminar un usuario:', error);
       });
     } else {
-      // Lógica para agregar nueva persona
-      const nuevoUsuario: Usuario = {
-        id: this.usuarios.length > 0 ? Math.max(...this.usuarios.map(u => u.id)) + 1 : 1,
-        nombreCompleto: this.mantenedorForm.get('nombreCompleto')?.value,
-        nombreUsuario: this.mantenedorForm.get('nombreUsuario')?.value,
-        contrasena: this.mantenedorForm.get('contrasenaUsuario1')?.value,
-        correoUsuario: this.mantenedorForm.get('correoUsuario')?.value,
-        fechaNacimiento: this.mantenedorForm.get('fechaNacimiento')?.value,
-        direccionDespacho: this.mantenedorForm.get('direccionDespacho')?.value,
-        rol: this.mantenedorForm.get('rol')?.value,
-        sesionIniciada: false
-      };
-
-      this.usuarioService.agregarUsuario(nuevoUsuario).subscribe(() => {
-        console.log('Usuario Agregado Exitosamente');
-        this.obtenerTodosLosUsuarios();
-      }, error => {
-        console.error('Ocurrió un error al agregar un usuario:', error);
-      });
+      window.alert('El elemento de la lista no existe');
     }
-
-    this.modalInstance.hide();
-  } else {
-    console.log(this.mantenedorForm.errors);
-    alert('Favor de ingresar los campos obligatorios');
   }
-}
-
-/**
- * Elimina el usuario de la lista.
- * @param usuario - Usuario a eliminar.
- */
-eliminar(usuario: Usuario): void {
-  this.usuarioService.eliminarUsuario(usuario.id).subscribe({
-    next: () => {
-      console.log('Usuario Eliminado Exitosamente');
-      this.obtenerTodosLosUsuarios();
-      alert('Usuario Eliminado Exitosamente');
-    },
-    error: (error) => {
-      console.error('Ocurrió un error al eliminar un usuario:', error);
-      alert('Ocurrió un error al eliminar un usuario.');
-    }
-  });
-}
 }

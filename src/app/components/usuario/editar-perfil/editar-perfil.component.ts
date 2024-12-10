@@ -4,6 +4,7 @@ import { NavbarComponent } from '../../../navbar/navbar.component';
 import { FooterComponent } from '../../../footer/footer.component';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, ValidationErrors, ValidatorFn, AbstractControl } from '@angular/forms';
 import { Usuario } from '../../../model/usuario';
+import { UsuarioService } from '../../../services/usuario.service';
 
 /**
  * @description
@@ -16,7 +17,8 @@ import { Usuario } from '../../../model/usuario';
   standalone: true,
   imports: [NavbarComponent, FooterComponent, ReactiveFormsModule, CommonModule],
   templateUrl: './editar-perfil.component.html',
-  styleUrl: './editar-perfil.component.scss'
+  styleUrl: './editar-perfil.component.scss',
+  providers: [UsuarioService]
 })
 export class EditarPerfilComponent {
 
@@ -27,7 +29,7 @@ export class EditarPerfilComponent {
   /**
    * Lista de usuarios almacenados en la variable de sesión
    */
-  listaUsuarios: any[] = JSON.parse(sessionStorage.getItem('usuarios') || '[]');
+  listaUsuarios: Usuario[] = [];
   /**
    * Instancia de usuario logeado usando la interfaz Usuario
    */
@@ -35,16 +37,17 @@ export class EditarPerfilComponent {
   /**
    * @constructor
    * @param fb - Servicio de creación de formulario de Angular
+   * @param usuarioService - Servicio de de Usuarios utilizado para consumir los servicios REST
    */
-  constructor(private fb: FormBuilder) { }
+  constructor(private usuarioService: UsuarioService, public fb: FormBuilder) { }
 
   /**
    * Metodo de inicialización del componente.
    * Obtiene el usuario logeado en el sistema y crea el formulario de edición.
    */
   ngOnInit(): void {
-    this.obtenerUsuario();
-    this.inicializarFormulario();
+    this.obtenerTodosLosUsuarios();
+    
   }
 
   /**
@@ -67,10 +70,22 @@ export class EditarPerfilComponent {
     }
   }
 
+  /**
+   * Obtiene todos los usuarios registrados en el JSON REST
+   * Una vez obtenidos, llama al metodo verificarSessionUsuario
+   */
+  obtenerTodosLosUsuarios():void{
+    this.usuarioService.obtenerTodosLosUsuarios().subscribe(data => {
+      this.listaUsuarios = data;
+      this.obtenerUsuario();
+      this.inicializarFormulario();
+    });
+  }
+
 
   /**
    * Metodo encargado de la actualización del usuario.
-   * Actualiza la información del usuario almacenado en sesión y muestra una alerta de JavaScript para notificar si el cambio fue completado.
+   * Actualiza la información del usuario y muestra una alerta de JavaScript para notificar si el cambio fue completado.
    */
   actualizarUsuario(): void {
     if (this.updateForm.valid && this.usuariologeado) {
@@ -82,11 +97,12 @@ export class EditarPerfilComponent {
       this.usuariologeado.contrasena = valoresFormulario.contrasenaUsuario1;
       this.usuariologeado.direccionDespacho = valoresFormulario.direccionDespacho;
 
-      const index = this.listaUsuarios.findIndex(usuario => usuario.nombreUsuario === nombreUsuario);
-      if (index !== -1) {
-        this.listaUsuarios[index] = this.usuariologeado;
-        sessionStorage.setItem('usuarios', JSON.stringify(this.listaUsuarios));
-      }
+      this.usuarioService.actualizarUsuario(this.usuariologeado.id, this.usuariologeado).subscribe(edit => {
+        console.log('Usuario Editado Exitosamente', edit);
+        this.obtenerTodosLosUsuarios();  
+      }, error => {
+        console.error('Ocurrio un error al agregar un usuario:', error);
+      });
 
       alert('Usuario actualizado correctamente.');
 

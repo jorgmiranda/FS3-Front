@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "ActividadSumativa2": {
+    "ActividadExamen": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -17,7 +17,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/actividad-sumativa2",
+            "outputPath": "dist/actividad-examen",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
@@ -48,13 +48,13 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "2MB",
-                  "maximumError": "5MB"
+                  "maximumWarning": "500kB",
+                  "maximumError": "1MB"
                 },
                 {
                   "type": "anyComponentStyle",
                   "maximumWarning": "2kB",
-                  "maximumError": "10kB"
+                  "maximumError": "500kB"
                 }
               ],
               "outputHashing": "all"
@@ -71,10 +71,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "ActividadSumativa2:build:production"
+              "buildTarget": "ActividadExamen:build:production"
             },
             "development": {
-              "buildTarget": "ActividadSumativa2:build:development"
+              "buildTarget": "ActividadExamen:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -100,7 +100,9 @@
             ],
             "scripts": [
               "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
-            ]
+            ],
+            "karmaConfig": "karma.conf.js",
+            "codeCoverage": true
           }
         }
       }

@@ -4,6 +4,8 @@ import { isPlatformBrowser } from '@angular/common';
 import { Usuario } from '../model/usuario';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { UsuarioService } from '../services/usuario.service';
+import { HttpClientModule } from '@angular/common/http';
 
 /**
  * @description
@@ -21,10 +23,11 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [RouterModule, CommonModule],
+  imports: [RouterModule, CommonModule, HttpClientModule],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.scss',
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None,
+  providers: [UsuarioService]
 })
 export class NavbarComponent implements OnInit {
   /**
@@ -47,8 +50,9 @@ export class NavbarComponent implements OnInit {
    * @constructor
    * @param platformId - Identificado de la plataforma (Navegador o Servidor)
    * @param router - Servicio de enrutamiento de Angular
+   * @param usuarioService - Servicio de de Usuarios utilizado para consumir los servicios REST
    */
-  constructor(@Inject(PLATFORM_ID) private platformId: Object, private router:Router) { }
+  constructor(@Inject(PLATFORM_ID) private platformId: Object, private router:Router, private usuarioService: UsuarioService) { }
 
 
   /**
@@ -60,10 +64,9 @@ export class NavbarComponent implements OnInit {
     if (isPlatformBrowser(this.platformId)) {
       this.inicializarCarrito();
       this.listaProductos = JSON.parse(sessionStorage.getItem('listaProductos') || '[]');
-      this.listaUsuarios = JSON.parse(sessionStorage.getItem('usuarios') || '[]');
+      //this.listaUsuarios = JSON.parse(sessionStorage.getItem('usuarios') || '[]');
       this.instanciarShowHMTL();
-      this.verificarSesionUsuario();
-
+      this.obtenerTodosLosUsuarios();
 
     }
   }
@@ -93,8 +96,9 @@ export class NavbarComponent implements OnInit {
     const contarProductos = document.querySelector('#contador-productos') as HTMLElement | null;
     const cartEmpty = document.querySelector('.cart-empty') as HTMLElement | null;
     const cartTotal = document.querySelector('.cart-total') as HTMLElement | null;
-    if (rowProduct && valorTotal && contarProductos && cartEmpty && cartTotal) {
-      this.showHtml(rowProduct, valorTotal, contarProductos, cartEmpty, cartTotal);
+    const cartButton = document.querySelector('.cart-button') as HTMLElement | null;
+    if (rowProduct && valorTotal && contarProductos && cartEmpty && cartTotal && cartButton) {
+      this.showHtml(rowProduct, valorTotal, contarProductos, cartEmpty, cartTotal, cartButton);
     }
 
 
@@ -114,16 +118,19 @@ export class NavbarComponent implements OnInit {
     valorTotal: HTMLElement,
     contarProductos: HTMLElement,
     cartEmpty: HTMLElement,
-    cartTotal: HTMLElement
+    cartTotal: HTMLElement,
+    cartButton: HTMLElement
   ): void {
     if (!this.listaProductos.length) {
       cartEmpty.classList.remove('hidden');
       rowProduct.classList.add('hidden');
       cartTotal.classList.add('hidden');
+      cartButton.classList.add('hidden');
     } else {
       cartEmpty.classList.add('hidden');
       rowProduct.classList.remove('hidden');
       cartTotal.classList.remove('hidden');
+      cartButton.classList.remove('hidden');
     }
 
     // Limpiar HTML
@@ -149,7 +156,7 @@ export class NavbarComponent implements OnInit {
 
       rowProduct.append(containerProduct);
 
-      total += producto.cantidad * parseInt(producto.precio.replace('.', '').replace('$', ''));
+      total += producto.cantidad * parseInt(producto.precio.replace(',', '').replace('$', ''));
       totalProductos += producto.cantidad;
     });
 
@@ -174,16 +181,32 @@ export class NavbarComponent implements OnInit {
   }
 
   /**
+   * Obtiene todos los usuarios registrados en el JSON REST
+   * Una vez obtenidos, llama al metodo verificarSessionUsuario
+   */
+  obtenerTodosLosUsuarios():void{
+    this.usuarioService.obtenerTodosLosUsuarios().subscribe(data => {
+      this.listaUsuarios = data;
+      this.verificarSesionUsuario();
+    });
+  }
+
+  /**
    * Cierra la sesión del usuario logeado
    */
   cerrarSesion():void{
     if(this.usuariologeado){
       this.usuariologeado.sesionIniciada = false;
-      sessionStorage.setItem('usuarios', JSON.stringify(this.listaUsuarios));
+      this.usuarioService.actualizarUsuario(this.usuariologeado.id, this.usuariologeado ).subscribe(edit => {
+        console.log('Usuario Editado Exitosamente', edit);
+        this.obtenerTodosLosUsuarios();  
+      }, error => {
+        console.error('Ocurrio un error al agregar un usuario:', error);
+      });
       this.sesionIniciada = false;
       this.usuariologeado = undefined;
-      alert("Sesion Cerrada");
-      this.router.navigate(['inicio']);
+      //alert("Sesion Cerrada");
+      this.router.navigate(['/inicio']);
     }
   }
 }
