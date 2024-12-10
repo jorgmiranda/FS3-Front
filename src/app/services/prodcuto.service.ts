@@ -32,7 +32,7 @@ export class ProductoService {
   constructor(private http: HttpClient) { }
 
   /**
-   * Obtiene la lista de todos los usuarios.
+   * Obtiene la lista de todos los Productos.
    * @returns Un Observable con la lista de productos
    */
   obtenerTodosLosProductos(): Observable<Producto[]> {

@@ -9,6 +9,7 @@ import { EditarPerfilComponent } from './components/usuario/editar-perfil/editar
 import { EditarProductosComponent } from './components/admin/editar-productos/editar-productos.component';
 import { InicioAdminComponent } from './components/admin/inicio-admin/inicio-admin.component';
 import { ListaUsuariosComponent } from './components/admin/lista-usuarios/lista-usuarios.component';
+import { PagoProductosComponent } from './components/pago-productos/pago-productos.component';
 
 export const routes: Routes = [
     {path: 'inicio', component: InicioComponent},
@@ -20,6 +21,7 @@ export const routes: Routes = [
     {path: 'admin/inicio', component:InicioAdminComponent},
     {path: 'admin/editarProducto/:seccion', component:EditarProductosComponent},
     {path: 'admin/mantenedorUsuarios', component:ListaUsuariosComponent},
+    {path: 'pagar', component:PagoProductosComponent},
     //Pagina de inicio
     {path: '', redirectTo: 'inicio', pathMatch: 'full'},
     {path: '**', redirectTo: 'inicio'}

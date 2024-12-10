@@ -39,7 +39,7 @@ export class EditarPerfilComponent {
    * @param fb - Servicio de creación de formulario de Angular
    * @param usuarioService - Servicio de de Usuarios utilizado para consumir los servicios REST
    */
-  constructor(private usuarioService: UsuarioService, private fb: FormBuilder) { }
+  constructor(private usuarioService: UsuarioService, public fb: FormBuilder) { }
 
   /**
    * Metodo de inicialización del componente.

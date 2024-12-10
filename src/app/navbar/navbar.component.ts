@@ -96,8 +96,9 @@ export class NavbarComponent implements OnInit {
     const contarProductos = document.querySelector('#contador-productos') as HTMLElement | null;
     const cartEmpty = document.querySelector('.cart-empty') as HTMLElement | null;
     const cartTotal = document.querySelector('.cart-total') as HTMLElement | null;
-    if (rowProduct && valorTotal && contarProductos && cartEmpty && cartTotal) {
-      this.showHtml(rowProduct, valorTotal, contarProductos, cartEmpty, cartTotal);
+    const cartButton = document.querySelector('.cart-button') as HTMLElement | null;
+    if (rowProduct && valorTotal && contarProductos && cartEmpty && cartTotal && cartButton) {
+      this.showHtml(rowProduct, valorTotal, contarProductos, cartEmpty, cartTotal, cartButton);
     }
 
 
@@ -117,16 +118,19 @@ export class NavbarComponent implements OnInit {
     valorTotal: HTMLElement,
     contarProductos: HTMLElement,
     cartEmpty: HTMLElement,
-    cartTotal: HTMLElement
+    cartTotal: HTMLElement,
+    cartButton: HTMLElement
   ): void {
     if (!this.listaProductos.length) {
       cartEmpty.classList.remove('hidden');
       rowProduct.classList.add('hidden');
       cartTotal.classList.add('hidden');
+      cartButton.classList.add('hidden');
     } else {
       cartEmpty.classList.add('hidden');
       rowProduct.classList.remove('hidden');
       cartTotal.classList.remove('hidden');
+      cartButton.classList.remove('hidden');
     }
 
     // Limpiar HTML
@@ -152,7 +156,7 @@ export class NavbarComponent implements OnInit {
 
       rowProduct.append(containerProduct);
 
-      total += producto.cantidad * parseInt(producto.precio.replace('.', '').replace('$', ''));
+      total += producto.cantidad * parseInt(producto.precio.replace(',', '').replace('$', ''));
       totalProductos += producto.cantidad;
     });
 

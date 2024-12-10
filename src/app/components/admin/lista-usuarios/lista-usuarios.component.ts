@@ -53,7 +53,7 @@ export class ListaUsuariosComponent {
    * @param usuarioService - Servicio de de Usuarios utilizado para consumir los servicios REST
    * @param fb - Servicio de creación de formulario de Angular
    */
-  constructor(private usuarioService: UsuarioService, private fb: FormBuilder) { }
+  constructor(private usuarioService: UsuarioService, public fb: FormBuilder) { }
 
    /**
    * Metodo de inicialización del componente.

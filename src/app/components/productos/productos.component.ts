@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
 import { isPlatformBrowser } from '@angular/common';
 import { Producto } from '../../model/producto';
 import { ProductoService } from '../../services/prodcuto.service';
+import { CompraproductosService } from '../../services/compraproductos.service';
 
 /**
  * @description
@@ -22,7 +23,7 @@ import { ProductoService } from '../../services/prodcuto.service';
   templateUrl: './productos.component.html',
   styleUrl: './productos.component.scss',
   encapsulation: ViewEncapsulation.None,
-  providers: [ProductoService]
+  providers: [CompraproductosService]
 })
 export class ProductosComponent implements OnInit {
   /**
@@ -44,7 +45,7 @@ export class ProductosComponent implements OnInit {
    * @param elRef - Referencia al elemento del DOM asociado con este componente.
    */
   constructor(@Inject(PLATFORM_ID) private platformId: Object, private route: ActivatedRoute, private elRef: ElementRef
-  , private productoService: ProductoService) { }
+  , private productoService: CompraproductosService) { }
 
   /**
    * Metodo de inicialización del componente
@@ -85,10 +86,12 @@ export class ProductosComponent implements OnInit {
     const contarProductos = this.elRef.nativeElement.querySelector('#contador-productos');
     const cartEmpty = this.elRef.nativeElement.querySelector('.cart-empty');
     const cartTotal = this.elRef.nativeElement.querySelector('.cart-total');
+    const cartButton = this.elRef.nativeElement.querySelector('.cart-button');
 
     if (productList && event.target instanceof HTMLElement && event.target.classList.contains('btn-add-cart')) {
       const producto = event.target.parentElement as HTMLElement;
       const infoProducto = {
+        idProducto: producto.querySelector('.card-id')?.textContent?.replace('SKU: ', '') || '',
         cantidad: 1,
         titulo: producto.querySelector('h5')?.textContent || '',
         precio: producto.querySelector('.precio')?.textContent?.replace('Precio: ', '') || ''
@@ -108,8 +111,8 @@ export class ProductosComponent implements OnInit {
       }
       sessionStorage.setItem('listaProductos', JSON.stringify(this.listaProductos));
 
-      if (rowProduct && valorTotal && contarProductos && cartEmpty && cartTotal) {
-        this.showHtml(rowProduct, valorTotal, contarProductos, cartEmpty, cartTotal);
+      if (rowProduct && valorTotal && contarProductos && cartEmpty && cartTotal && cartButton) {
+        this.showHtml(rowProduct, valorTotal, contarProductos, cartEmpty, cartTotal, cartButton);
       }
     }
   }
@@ -126,8 +129,9 @@ export class ProductosComponent implements OnInit {
     const contarProductos = document.querySelector('#contador-productos') as HTMLElement | null;
     const cartEmpty = document.querySelector('.cart-empty') as HTMLElement | null;
     const cartTotal = document.querySelector('.cart-total') as HTMLElement | null;
+    const cartButton = document.querySelector('.cart-button') as HTMLElement | null;
 
-    if (rowProduct && valorTotal && contarProductos && cartEmpty && cartTotal) {
+    if (rowProduct && valorTotal && contarProductos && cartEmpty && cartTotal && cartButton) {
       rowProduct.addEventListener('click', (e) => {
         if ((e.target as HTMLElement).classList.contains('icon-close')) {
           const producto = (e.target as HTMLElement).parentElement as HTMLElement;
@@ -138,7 +142,7 @@ export class ProductosComponent implements OnInit {
           );
 
           sessionStorage.setItem('listaProductos', JSON.stringify(this.listaProductos));
-          this.showHtml(rowProduct, valorTotal, contarProductos, cartEmpty, cartTotal);
+          this.showHtml(rowProduct, valorTotal, contarProductos, cartEmpty, cartTotal, cartButton);
           console.log(this.listaProductos);
         }
       });
@@ -159,16 +163,19 @@ export class ProductosComponent implements OnInit {
     valorTotal: HTMLElement,
     contarProductos: HTMLElement,
     cartEmpty: HTMLElement,
-    cartTotal: HTMLElement
+    cartTotal: HTMLElement,
+    cartButton: HTMLElement
   ): void {
     if (!this.listaProductos.length) {
       cartEmpty.classList.remove('hidden');
       rowProduct.classList.add('hidden');
       cartTotal.classList.add('hidden');
+      cartButton.classList.add('hidden');
     } else {
       cartEmpty.classList.add('hidden');
       rowProduct.classList.remove('hidden');
       cartTotal.classList.remove('hidden');
+      cartButton.classList.remove('hidden');
     }
 
     // Limpiar HTML

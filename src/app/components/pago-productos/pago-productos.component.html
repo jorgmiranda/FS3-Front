@@ -1,1 +1,42 @@
-<p>pago-productos works!</p>
+<app-navbar></app-navbar>
+<main>
+  <div style="margin: 1%;">
+    <h1 class="titulo-pagina">Detalle de productos</h1>
+    <br>
+    <br>
+    <!-- Verificar si el usuario está logueado -->
+    <div *ngIf="sesionIniciada; else noLogin">
+      <table class="productos-tabla">
+        <thead>
+          <tr>
+            <th>Título</th>
+            <th>Cantidad</th>
+            <th>Precio Unitario</th>
+            <th>Subtotal</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let producto of listaProductos">
+            <td>{{ producto.titulo }}</td>
+            <td>{{ producto.cantidad }}</td>
+            <td>{{ producto.precio }}</td>
+            <td>{{ calcularSubtotal(producto) | currency:'':'symbol':'1.0-0' }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <br>
+      <h3>Total: {{ calcularTotal() | currency:'':'symbol':'1.0-0' }}</h3>
+      <br>
+      <button (click)="finalizarCompra()" class="btn btn-success">Finalizar Compra</button>
+    </div>
+
+    <!-- Mensaje de no login -->
+    <ng-template #noLogin>
+      <p class="mensaje-login">Debes iniciar sesión para completar la compra.</p>
+      <a type="submit" class="btn btn-primary" routerLink="/login">Iniciar Sesión</a>
+    </ng-template>
+  </div>
+</main>
+<br>
+<br>
+<app-footer></app-footer>

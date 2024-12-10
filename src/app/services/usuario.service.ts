@@ -76,6 +76,7 @@ export class UsuarioService {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
 
+}
   // httpOptions = {
   //   headers: new HttpHeaders({
   //     "Content-Type": "application/json",
@@ -107,4 +108,4 @@ export class UsuarioService {
 
 
 
-}
+

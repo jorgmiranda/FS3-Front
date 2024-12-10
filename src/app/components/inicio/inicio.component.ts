@@ -6,6 +6,9 @@ import { FooterComponent } from '../../footer/footer.component';
 import { Usuario } from '../../model/usuario';
 import { UsuarioService } from '../../services/usuario.service';
 import { HttpClientModule } from '@angular/common/http';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, ValidationErrors, ValidatorFn, AbstractControl  } from '@angular/forms'; 
+import { CompraproductosService } from '../../services/compraproductos.service';
+import { Producto } from '../../model/producto';
 
 /**
  * @description
@@ -17,13 +20,15 @@ import { HttpClientModule } from '@angular/common/http';
 @Component({
   selector: 'app-inicio',
   standalone: true,
-  imports: [NavbarComponent, FooterComponent, CommonModule, HttpClientModule],
+  imports: [NavbarComponent, FooterComponent, CommonModule, HttpClientModule, ReactiveFormsModule],
   templateUrl: './inicio.component.html',
   styleUrl: './inicio.component.scss',
-  providers: [UsuarioService]
+  providers: [UsuarioService, CompraproductosService]
 })
 export class InicioComponent implements OnInit{
 
+  productos: Producto[] = [];
+  buscarForm!: FormGroup;
   /**
    * instancia de arreglo de productos
    */
@@ -45,7 +50,7 @@ export class InicioComponent implements OnInit{
    * @param platformId - Identificado de la plataforma (Navegador o Servidor)
    * @param usuarioService - Servicio de de Usuarios utilizado para consumir los servicios REST
    */
-  constructor(@Inject(PLATFORM_ID) private platformId: Object, private usuarioService: UsuarioService) { }
+  constructor(@Inject(PLATFORM_ID) private platformId: Object, private usuarioService: UsuarioService,  private fb: FormBuilder, private compraproductoService: CompraproductosService) { }
 
   /**
    * Metodo de inicialización del componente
@@ -54,6 +59,11 @@ export class InicioComponent implements OnInit{
    * Inicialia la lista de Usuarios
    */
   ngOnInit(): void {
+ 
+    this.buscarForm = this.fb.group({
+      nombre:  ['', Validators.required]
+    });
+
     this.obtenerTodosLosUsuarios();
     if (isPlatformBrowser(this.platformId)) {
       this.listaProductos = JSON.parse(sessionStorage.getItem('listaProductos') || '[]');
@@ -177,6 +187,16 @@ export class InicioComponent implements OnInit{
       this.listaUsuarios = data;
       this.verificarUsuario();
     });
+  }
+
+  buscarProductos():void{
+    if(this.buscarForm.valid){
+      const nombre = this.buscarForm.get('nombre')!.value;
+      this.compraproductoService.buscarProductosPorNombre(nombre).subscribe(data =>{
+        this.productos = data;
+      });
+
+    }
   }
 }
 

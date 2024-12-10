@@ -75,7 +75,7 @@ export class EditarProductosComponent implements OnInit{
    * @param route - Servicio de enrutamiento de Angular
    * @param fb - Servicio de creación de formulario de Angular
    */
-  constructor(private route: ActivatedRoute, private fb: FormBuilder, private productoService: ProductoService) { }
+  constructor(private route: ActivatedRoute, public fb: FormBuilder, private productoService: ProductoService) { }
 
   /**
    * Metodo de inicialización del componente
